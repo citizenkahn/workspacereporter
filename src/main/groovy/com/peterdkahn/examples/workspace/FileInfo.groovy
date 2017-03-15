@@ -18,11 +18,16 @@ import java.nio.file.attribute.PosixFileAttributes
  *
  */
 class FileInfo {
+  final static String FILE_TYPE_FILE = "file"
+  final static String FILE_TYPE_DIRECTORY = "directory"
+  final static String FILE_TYPE_SYMLINK = "symlink"
+
   final static String JSON_FIELD_NAME = "name"
   final static String JSON_FIELD_CLOC = "cloc"
   final static String JSON_FIELD_USER = "user"
   final static String JSON_FIELD_GROUP = "group"
   final static String JSON_FIELD_PERMISSON = "PERMISSON"
+  final static String JSON_FIELD_FILETYPE = "TYPE"
   final static String JSON_FIELD_SIZE = "size"
 
   private final File target
@@ -38,6 +43,18 @@ class FileInfo {
     clocInfo = new ClocInfo(target)
   }
 
+  String getFileType() {
+    if (target.absolutePath == target.canonicalPath) {
+      if (target.isFile() ) {
+        return FILE_TYPE_FILE
+      } else {
+        return FILE_TYPE_DIRECTORY
+      }
+    } else {
+      return FILE_TYPE_SYMLINK
+    }
+  }
+
   JsonObject toJson() {
     JsonObject json = new JsonObject()
     json.put(JSON_FIELD_NAME, name)
@@ -45,6 +62,7 @@ class FileInfo {
     json.put(JSON_FIELD_GROUP, groupOwner)
     json.put(JSON_FIELD_PERMISSON, permisionsString)
     json.put(JSON_FIELD_SIZE, size)
+    json.put(JSON_FIELD_FILETYPE, fileType)
     json.put(JSON_FIELD_CLOC, clocInfo.toJson())
     return json
   }
