@@ -33,6 +33,7 @@ class ApplicationTest {
       tc.assertEquals(response.statusCode(), 200)
       response.bodyHandler() { body ->
         tc.assertTrue(body.length() > 0)
+        println "body: ${body}"
         async.complete()
 
       }

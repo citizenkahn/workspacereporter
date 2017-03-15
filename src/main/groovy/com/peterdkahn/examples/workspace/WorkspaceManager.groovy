@@ -1,5 +1,8 @@
 package com.peterdkahn.examples.workspace
 
+import io.vertx.core.json.Json
+import io.vertx.core.json.JsonObject
+
 
 /**
  * Workspace Information Manager -- reports on file, files, cloc info
@@ -21,15 +24,36 @@ class WorkspaceManager {
     }
   }
 
-  List<File> getChildren(String path) {
-    File child = workspaceRoot
-    if ("/" != path) {
-      child = new File(workspaceRoot, path)
+  JsonObject pathToJson(String path) {
+    File target = getWorkspaceFile(path)
+    if (! target.exists()) {
+      throw new IOException("Cannot locate ${path}")
     }
-    if (child.isDirectory() && child.exists()) {
-      return child.listFiles()
+
+    if (target.isDirectory()) {
+      def names = target.listFiles().collect() { File f -> f.name }
+      JsonObject json = new JsonObject()
+      json.put("files", names)
+      return json
     } else {
-      throw new IOException("Cannot process ${child.absolutePath} - unknown file type")
+      Json.encode(new FileInfo(target))
+    }
+  }
+
+  private getWorkspaceFile(String path) {
+    File target = workspaceRoot
+    if (path != null && "/" != path) {
+      target = new File(workspaceRoot, path)
+    }
+    return target
+  }
+
+  List<File> getChildren(String path) {
+    File target = getWorkspaceFile(path)
+    if (target.isDirectory() && target.exists()) {
+      return target.listFiles()
+    } else {
+      throw new IOException("Cannot process ${target.absolutePath} - unknown file type")
     }
   }
 
