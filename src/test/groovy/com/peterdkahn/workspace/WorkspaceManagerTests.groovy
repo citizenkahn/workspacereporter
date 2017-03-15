@@ -1,13 +1,15 @@
-package com.peterdkahn.examples.vertx.app
+package com.peterdkahn.workspace
 
+import com.peterdkahn.examples.vertx.app.TestBase
+import com.peterdkahn.examples.workspace.FileInfo
+import com.peterdkahn.examples.workspace.WorkspaceManager
 import org.hamcrest.core.StringContains
 import org.junit.Before
 import org.junit.Test
 import static org.junit.Assert.*
 
-import java.io.File
-
 /**
+ * Workspace access tests
  * Created by pkahn on 3/14/17.
  */
 class WorkspaceManagerTests extends TestBase {
@@ -52,8 +54,17 @@ class WorkspaceManagerTests extends TestBase {
   }
 
   @Test
-  void  getInfo() {
+  void  getInfoHappyPath() {
+    File childFile = new File(testDir, "childFile.txt")
+    childFile << "data"
 
+    FileInfo info = new FileInfo(childFile)
+    assertEquals("User", System.getenv("USER"), info.userOwner)
+
+    assertEquals("Size", 4, info.size)
+
+    FileInfo etcHosts = new FileInfo(new File("/etc/hosts"))
+    assertEquals("Group", "root", etcHosts.groupOwner)
 
   }
 }

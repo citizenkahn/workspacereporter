@@ -1,11 +1,13 @@
-package com.peterdkahn.examples.vertx.app
+package com.peterdkahn.examples.workspace
 
+import java.nio.file.Files
 import java.nio.file.attribute.FileTime
 import java.nio.file.attribute.PosixFileAttributes
 
 /**
  * Created by pkahn on 3/14/17.
  *
+ * Data object for a file
  * permissions
  * size
  * mod date
@@ -17,13 +19,20 @@ import java.nio.file.attribute.PosixFileAttributes
 class FileInfo {
   private final File target
   private final PosixFileAttributes posixAttrib
+  private ClocInfo clocInfo
+
   FileInfo(File target) {
     this.target = target
 
-    PosixFileAttributes posixAttrib =
-      Files.readAttributes(target, PosixFileAttributes.class);
+    posixAttrib =
+      Files.readAttributes(target.toPath(), PosixFileAttributes.class)
 
-    getClo
+    clocInfo = new ClocInfo(target)
+  }
+
+
+  ClocInfo getClocInfo() {
+    return clocInfo
   }
 
   Date getModification() {

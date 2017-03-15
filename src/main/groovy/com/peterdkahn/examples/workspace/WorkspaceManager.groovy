@@ -1,8 +1,8 @@
-package com.peterdkahn.examples.vertx.app
+package com.peterdkahn.examples.workspace
 
-import java.nio.file.attribute.PosixFileAttributes
 
 /**
+ * Workspace Information Manager -- reports on file, files, cloc info
  * Created by pkahn on 3/14/17.
  */
 class WorkspaceManager {
@@ -28,6 +28,8 @@ class WorkspaceManager {
     }
     if (child.isDirectory() && child.exists()) {
       return child.listFiles()
+    } else {
+      throw new IOException("Cannot process ${child.absolutePath} - unknown file type")
     }
   }
 

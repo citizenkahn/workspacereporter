@@ -20,6 +20,7 @@ def doOnChange = './gradlew classes'
 dependencies {
     compile "io.vertx:vertx-core:$vertxVersion"
     compile "io.vertx:vertx-web:$vertxVersion"
+    compile 'org.yaml:snakeyaml:1.18'
     compile 'org.codehaus.groovy:groovy-all:2.4.9'
 
     testCompile "junit:junit:4.12"

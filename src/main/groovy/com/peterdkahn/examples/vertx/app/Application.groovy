@@ -1,13 +1,14 @@
 package com.peterdkahn.examples.vertx.app
 
+import com.peterdkahn.examples.workspace.WorkspaceManager
 import io.vertx.core.AbstractVerticle
-import io.vertx.core.Future
 import io.vertx.core.json.Json
 import io.vertx.ext.web.Router
 
 
 /**
  * Created by pkahn on 3/14/17.
+ * Web application using vertx for rest api
  */
 class Application extends AbstractVerticle {
     private List<String> names = ["a", "b"]
