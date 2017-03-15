@@ -74,9 +74,20 @@ class WorkspaceManager {
     }
 
     if (target.isDirectory()) {
-      def names = target.listFiles().collect() { File f -> f.name }
+      def list = []
+      target.listFiles().each { File f ->
+        def map = [:]
+        map.put('name', f.name)
+        if (f.isFile()) {
+          map.put('type', 'file')
+        } else {
+          map.put('type', 'directory')
+        }
+        list.add(map)
+      }
+
       JsonObject json = new JsonObject()
-      json.put("files", names)
+      json.put('files', list)
       return json
     } else {
       FileInfo info = new FileInfo(target)

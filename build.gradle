@@ -10,10 +10,10 @@ repositories {
 
 version = '1.0-SNAPSHOT'
 sourceCompatibility = '1.8'
-mainClassName = 'com.peterdkahn.examples.vertx.app.Application'
+mainClassName = 'io.vertx.core.Launcher'
 
 def vertxVersion = '3.4.0'
-def mainVerticleName = 'io.vertx.starter.MainVerticle'
+def mainVerticleName = 'com.peterdkahn.examples.vertx.app.Application'
 def watchForChange = 'src/**/*'
 def doOnChange = './gradlew classes'
 
@@ -25,6 +25,8 @@ dependencies {
 
     testCompile "junit:junit:4.12"
     testCompile "io.vertx:vertx-unit:$vertxVersion"
+    testCompile "com.sun.jersey:jersey-client:1.8"
+
 }
 
 shadowJar {
