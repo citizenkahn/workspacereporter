@@ -27,6 +27,11 @@ class WorkspaceManager {
     }
   }
 
+  /**
+   * Obtain content of file
+   * @param path within workspace
+   * @return contents, text or od output for binary
+   */
   String getContent(String path) {
     File target = getWorkspaceFile(path)
     if (target.isDirectory()) {
@@ -44,6 +49,11 @@ class WorkspaceManager {
 
   }
 
+  boolean isDirectory(String path) {
+    File target = getWorkspaceFile(path)
+    return target.exists() && target.isDirectory()
+  }
+
   boolean isBinary(File target) {
     if ('text' == Files.probeContentType(target.toPath()).split(/\//)[0]) {
       return false
@@ -52,6 +62,11 @@ class WorkspaceManager {
     }
   }
 
+  /**
+   * Generate json output for directory or file
+   * @param path within workspace
+   * @return file listing for directory, FileInfo for file
+   */
   JsonObject pathToJson(String path) {
     File target = getWorkspaceFile(path)
     if (! target.exists()) {

@@ -50,6 +50,43 @@ class ApplicationTest extends TestBase{
   }
 
   @Test
+  void happyPathDepthUriTestDirContent(TestContext tc) {
+    // Given simple workspace with sub1/sub2/bar.txt
+    createWorkspace(["sub1/sub2/bar.txt"])
+    setAppWorkspace(tc, testDir)
+
+    // When  /api/lib/sub1/sub2
+    Async async = tc.async()
+
+    vertx.createHttpClient().getNow(8080,"localhost", "${Application.BASEURI}/sub1/sub2?content") { response ->
+      async.complete()
+      tc.assertEquals(response.statusCode(), 404)
+    }
+  }
+
+  @Test
+  void happyPathDepthUriTestFileContent(TestContext tc) {
+    // Given simple workspace with sub1/sub2/foo.c
+    def pathParent = "sub1/sub2"
+    File cFile = createCFile(new File(testDir,pathParent))
+    setAppWorkspace(tc, testDir)
+
+    // When  /api/lib/sub1/sub2
+    Async async = tc.async()
+
+    vertx.createHttpClient().getNow(8080,"localhost", "${Application.BASEURI}/sub1/sub2/foo.c?content") { response ->
+      async.complete()
+      tc.assertEquals(response.statusCode(), 200)
+      response.bodyHandler() { body ->
+        // Then expect cfile contents
+        log.debug("body: ${body}")
+
+        tc.assertEquals(cFile.text,body.toString())
+      }
+    }
+  }
+
+  @Test
   void happyPathDepthUriTestDir(TestContext tc) {
     // Given simple workspace with sub1/sub2/bar.txt
     createWorkspace(["sub1/sub2/bar.txt"])
