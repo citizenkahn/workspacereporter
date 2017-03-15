@@ -13,8 +13,6 @@ import static org.junit.Assert.*
  * Created by pkahn on 3/14/17.
  */
 class WorkspaceManagerTests extends TestBase {
-
-  private File testDir
   private WorkspaceManager manager
   @Before
   void setUp() {

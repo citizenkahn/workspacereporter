@@ -4,9 +4,14 @@ import com.peterdkahn.examples.workspace.WorkspaceManager
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.eventbus.Message
 import io.vertx.core.http.HttpMethod
+import io.vertx.core.http.HttpServer
 import io.vertx.core.logging.LoggerFactory
 import io.vertx.core.logging.Logger
 import io.vertx.ext.web.Router
+import io.vertx.ext.web.handler.sockjs.BridgeOptions
+import io.vertx.ext.web.handler.sockjs.PermittedOptions
+import io.vertx.ext.web.handler.sockjs.SockJSHandler
+
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -36,34 +41,43 @@ class Application extends AbstractVerticle {
     // Set Default  @TODO switch to property
     setWorkspaceRoot("/home/pkahn/code/linux-stable")
 
-    // Listen for change to workspace
-    vertx.eventBus.consumer(EVENT_SET_WORKSPACE).handler({ Message message ->
-      setWorkspaceRoot(message.body())
-      message.reply("OK")
-    })
 
 
     // Setup Server
     Router router = Router.router(vertx)
 
+    BridgeOptions options = new BridgeOptions().
+      addOutboundPermitted(
+        new PermittedOptions().
+          setAddress(EVENT_SET_WORKSPACE)
+      );
+
+    router.route("/eventbus/*").handler(SockJSHandler.create(vertx).bridge(options))
+
     // Set Handler
     router.routeWithRegex(HttpMethod.GET, "${BASEURI}.*").handler( { context->
       //def uri = context.request().uri().split(/\?/)[0]
       def path = getWorkspacePath(context.request().uri())
-
+      def jsonString = workspaceManager.pathToJson(path).toString()
+      log.info("Marshalled JSON ${jsonString}")
       context.response()
         .putHeader("content-type", "application/json")
-        .end(workspaceManager.pathToJson(path).toString())
+        .end(jsonString)
     })
 
-    vertx.createHttpServer()
-      .requestHandler(router.&accept)
-      .listen(8080)
 
+    HttpServer httpServer = vertx.createHttpServer()
+    httpServer.requestHandler(router.&accept).listen(8080)
+
+    // Listen for change to workspace
+    vertx.eventBus.consumer(EVENT_SET_WORKSPACE).handler({ Message message ->
+      setWorkspaceRoot(message.body().toString())
+      message.reply("OK")
+    })
 
   }
 
-  def getWorkspacePath(def uri) {
+  def getWorkspacePath(uri) {
     Matcher m = workspacePattern.matcher(uri)
     if (! m.matches()) {
       throw new IOException("bad file for ${uri}")

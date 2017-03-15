@@ -11,7 +11,6 @@ import static org.junit.Assert.*
  * Created by pkahn on 3/14/17.
  */
 class ClocInfoTests extends TestBase {
-  private File testDir
   private File cFile
   private File makeFile
   @Before
@@ -20,19 +19,6 @@ class ClocInfoTests extends TestBase {
     cFile = createCFile()
   }
 
-  private File createCFile(name = "foo.c") {
-    File target = new File(testDir, name)
-    if (target.exists()) { target.delete() }
-    target << """//A C File
-#include <stdio.h>
-int i = 0;
-
-// a loop
-for (i = 1; i < 100; i++) {
-  print i;
-}
-"""
-  }
 
   @Test
   void cFileHappyPath() {
@@ -42,10 +28,10 @@ for (i = 1; i < 100; i++) {
     ClocInfo info = new ClocInfo(cFile)
 
     // Then expect reported quantities
-    assertEquals("Total", 8, info.getTotalLines())
-    assertEquals("Comments", 2, info.getCommentLines())
-    assertEquals("Code", 5, info.getCodeLines())
-    assertEquals("Blank", 1, info.getBlankLines())
+    assertEquals("Total", CFILE_TOTAL, info.getTotalLines())
+    assertEquals("Comments", CFILE_COMMENT, info.getCommentLines())
+    assertEquals("Code", CFILE_CODE, info.getCodeLines())
+    assertEquals("Blank", CFILE_BLANK, info.getBlankLines())
   }
 
   @Test
@@ -57,6 +43,6 @@ for (i = 1; i < 100; i++) {
     expectedException.expect(IOException.class)
 
     // When clock info loaded
-    ClocInfo info = new ClocInfo(target)
+    new ClocInfo(target)
   }
 }

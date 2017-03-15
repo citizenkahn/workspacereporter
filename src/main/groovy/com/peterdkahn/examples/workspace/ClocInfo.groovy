@@ -1,5 +1,7 @@
 package com.peterdkahn.examples.workspace
 
+import io.vertx.core.json.Json
+import io.vertx.core.json.JsonObject
 import org.yaml.snakeyaml.Yaml
 
 /**
@@ -7,7 +9,12 @@ import org.yaml.snakeyaml.Yaml
  * Created by pkahn on 3/14/17.
  */
 class ClocInfo {
-  final static String clocExe="/usr/bin/cloc"
+  final static String JSON_FIELD_BLANK_LINES="blank"
+  final static String JSON_FIELD_CODE_LINES="code"
+  final static String JSON_FIELD_COMMENT_LINES="comment"
+  final static String JSON_FIELD_TOTAL_LINES="total"
+
+  final static String CLOCEXE ="/usr/bin/cloc"
   private final File target
   private Map clocData
   ClocInfo(File target) {
@@ -21,6 +28,14 @@ class ClocInfo {
   int getCommentLines() { return (int) clocData['SUM']["comment"] }
   int getTotalLines() { return getBlankLines() + getCodeLines() + getCommentLines() }
 
+  JsonObject toJson() {
+    JsonObject json = new JsonObject()
+    json.put(JSON_FIELD_BLANK_LINES, blankLines)
+    json.put(JSON_FIELD_CODE_LINES, codeLines)
+    json.put(JSON_FIELD_COMMENT_LINES, commentLines)
+    json.put(JSON_FIELD_TOTAL_LINES, totalLines)
+    return json
+  }
   /**
    * Read cloc info
    */
@@ -30,7 +45,7 @@ class ClocInfo {
     def proc = null
 
     try {
-      proc = "${clocExe} --quiet --yaml ${target.absolutePath}".execute()
+      proc = "${CLOCEXE} --quiet --yaml ${target.absolutePath}".execute()
 
       proc.consumeProcessOutput(output, error)
       proc.waitFor()

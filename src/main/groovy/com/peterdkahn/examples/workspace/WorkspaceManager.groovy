@@ -36,7 +36,8 @@ class WorkspaceManager {
       json.put("files", names)
       return json
     } else {
-      Json.encode(new FileInfo(target))
+      FileInfo info = new FileInfo(target)
+      return info.toJson()
     }
   }
 

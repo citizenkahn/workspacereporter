@@ -1,7 +1,8 @@
 package com.peterdkahn.examples.workspace
 
+import io.vertx.core.json.JsonObject
+
 import java.nio.file.Files
-import java.nio.file.attribute.FileTime
 import java.nio.file.attribute.PosixFileAttributes
 
 /**
@@ -17,6 +18,13 @@ import java.nio.file.attribute.PosixFileAttributes
  *
  */
 class FileInfo {
+  final static String JSON_FIELD_NAME = "name"
+  final static String JSON_FIELD_CLOC = "cloc"
+  final static String JSON_FIELD_USER = "user"
+  final static String JSON_FIELD_GROUP = "group"
+  final static String JSON_FIELD_PERMISSON = "PERMISSON"
+  final static String JSON_FIELD_SIZE = "size"
+
   private final File target
   private final PosixFileAttributes posixAttrib
   private ClocInfo clocInfo
@@ -30,6 +38,16 @@ class FileInfo {
     clocInfo = new ClocInfo(target)
   }
 
+  JsonObject toJson() {
+    JsonObject json = new JsonObject()
+    json.put(JSON_FIELD_NAME, name)
+    json.put(JSON_FIELD_USER, userOwner)
+    json.put(JSON_FIELD_GROUP, groupOwner)
+    json.put(JSON_FIELD_PERMISSON, permisionsString)
+    json.put(JSON_FIELD_SIZE, size)
+    json.put(JSON_FIELD_CLOC, clocInfo.toJson())
+    return json
+  }
 
   ClocInfo getClocInfo() {
     return clocInfo
@@ -51,7 +69,7 @@ class FileInfo {
     return posixAttrib.group().name
   }
 
-  String GetPermisionsString() {
+  String getPermisionsString() {
     return posixAttrib.permissions().toString()
   }
 
@@ -59,22 +77,4 @@ class FileInfo {
     return posixAttrib.size()
   }
 
-  // CLOC Info
-  String getLanguage() {
-    return "langauges/langauge name"
-  }
-
-  int getBlankLines() {
-    return 0
-  }
-  int getCommentLines() {
-    return 0
-  }
-  int getCodeLines() {
-    return 0
-  }
-
-  int getTotalLines() {
-    return 0
-  }
 }
