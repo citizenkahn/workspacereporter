@@ -3,6 +3,9 @@ package com.peterdkahn.examples.workspace
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
 
+import javax.activation.MimetypesFileTypeMap
+import java.nio.file.Files
+
 
 /**
  * Workspace Information Manager -- reports on file, files, cloc info
@@ -21,6 +24,31 @@ class WorkspaceManager {
     }
     if (! workspaceRoot.isDirectory()) {
       throw new IOException("Workspace (${workspaceRoot.absolutePath}) is not a directory")
+    }
+  }
+
+  String getContent(String path) {
+    File target = getWorkspaceFile(path)
+    if (target.isDirectory()) {
+      def names = target.listFiles().collect() { File f -> f.name }
+      JsonObject json = new JsonObject()
+      json.put("files", names)
+      return json.toString()
+    } else {
+      if (! isBinary(target)) {
+        return target.text
+      } else {
+        return OctalDumper.dump(target)
+      }
+    }
+
+  }
+
+  boolean isBinary(File target) {
+    if ('text' == Files.probeContentType(target.toPath()).split(/\//)[0]) {
+      return false
+    } else {
+      return true
     }
   }
 
